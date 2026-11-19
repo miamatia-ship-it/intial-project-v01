@@ -1,171 +1,504 @@
 <!DOCTYPE html>
-<!--
-  index.html = STRUCTURE.
-  It holds the content of the page (text, headings, buttons, inputs)
-  and says what each piece IS. It does not decide how things look
-  (that is styles.css) or how they behave (that is script.js).
--->
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>One page, three files</title>
-
-  <!-- This line connects styles.css to this page. Remove it and the page turns plain. -->
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#174d38">
+    <meta name="description" content="A local two-player Buraco card game.">
+    <title>Buraco | Two-Player Card Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 
 <body>
-  <header>
-    <h1>One page, three files</h1>
-    <p class="lead">
-      You are looking at a web page built from <b class="t-html">index.html</b>,
-      <b class="t-css">styles.css</b> and <b class="t-js">script.js</b>.
-      Each section below explains one file and lets you try it.
-    </p>
-    <!-- script.js listens for clicks on this button (id="xray-toggle") -->
-    <button id="xray-toggle" type="button" aria-pressed="false">Turn on X-ray view</button>
-    <p class="hint" id="xray-note">X-ray view draws a dashed box around each HTML element. The box is CSS. The switch is JavaScript. The elements are HTML.</p>
-  </header>
 
-  <main>
-
-    <!-- ===================== 1. HTML ===================== -->
-    <section class="file file-html" id="html">
-      <h2>1. index.html: what is on the page</h2>
-      <p>
-        HTML is a set of <b>elements</b>. Each element has an opening tag, content, and a closing tag.
-        The tag tells the browser what the content <em>is</em>: a heading, a paragraph, a list, a button.
-      </p>
-      <pre><code>&lt;p&gt;Hello, world&lt;/p&gt;
- ^        ^        ^
- |        |        closing tag
- |        content
- opening tag</code></pre>
-
-      <h3>Try it</h3>
-      <p>Edit the HTML on the left. The result appears on the right. Try changing <code>h2</code> to <code>h1</code>, or add a new <code>&lt;li&gt;</code>.</p>
-      <div class="split">
-        <label class="field">
-          <span>HTML you write</span>
-          <textarea id="html-editor" rows="9" spellcheck="false">&lt;h2&gt;Hello&lt;/h2&gt;
-&lt;p&gt;This is a &lt;strong&gt;paragraph&lt;/strong&gt; with a &lt;a href="#html"&gt;link&lt;/a&gt;.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;One&lt;/li&gt;
-  &lt;li&gt;Two&lt;/li&gt;
-&lt;/ul&gt;
-&lt;button&gt;I am a button&lt;/button&gt;</textarea>
-        </label>
-        <div class="field">
-          <span>What the browser shows</span>
-          <div id="html-preview" class="preview" aria-live="polite"></div>
+    <!-- ==================== HEADER ==================== -->
+    <header id="app-header">
+        <div class="header-title">
+            <h1>Buraco</h1>
+            <span id="round-indicator">Round 1</span>
         </div>
-      </div>
-      <p class="rule"><b>Rule of thumb:</b> if you want to change <em>what</em> is on the page, edit <code>index.html</code>.</p>
-    </section>
 
-    <!-- ===================== 2. CSS ===================== -->
-    <section class="file file-css" id="css">
-      <h2>2. styles.css: how it looks</h2>
-      <p>
-        CSS is a list of rules. Each rule picks elements (the <b>selector</b>)
-        and sets <b>properties</b> to <b>values</b>.
-      </p>
-      <pre><code>.sample-card {          &larr; selector: which elements?
-  background: #ffe9a8;  &larr; property: value
-  border-radius: 12px;  &larr; another property: value
-}</code></pre>
+        <div class="header-scores">
+            <div class="player-score" id="player1-score">
+                <span>Player 1</span>
+                <strong id="player1-total">0</strong>
+            </div>
 
-      <h3>Try it</h3>
-      <p>Move the controls. The card below changes, and the CSS that makes the change is written out underneath.</p>
-      <div class="split">
-        <form class="controls" onsubmit="return false">
-          <label>Background colour
-            <input type="color" id="ctl-color" value="#ffe9a8">
-          </label>
-          <label>Text size: <output id="out-size">20px</output>
-            <input type="range" id="ctl-size" min="14" max="36" value="20">
-          </label>
-          <label>Corner roundness: <output id="out-radius">12px</output>
-            <input type="range" id="ctl-radius" min="0" max="48" value="12">
-          </label>
-        </form>
-        <div class="stage">
-          <div class="sample-card" id="sample-card">I am styled by CSS</div>
+            <div class="target-score">
+                <span>Target</span>
+                <strong>2,100</strong>
+            </div>
+
+            <div class="player-score" id="player2-score">
+                <span>Player 2</span>
+                <strong id="player2-total">0</strong>
+            </div>
         </div>
-      </div>
-      <pre><code id="css-output">/* move a control to see the CSS */</code></pre>
-      <p class="rule"><b>Rule of thumb:</b> if you want to change <em>how</em> something looks (colour, size, spacing, layout), edit <code>styles.css</code>.</p>
+
+        <div class="header-actions">
+            <button id="rules-button" type="button">How to Play</button>
+            <button id="new-game-button" type="button">New Game</button>
+        </div>
+    </header>
+
+
+    <!-- ==================== MAIN GAME ==================== -->
+    <main id="game-container">
+
+        <!-- Game information -->
+        <section id="game-info" aria-label="Game information">
+            <div>
+                <span>Current Turn</span>
+                <strong id="current-player">Player 1</strong>
+            </div>
+
+            <div>
+                <span>Round</span>
+                <strong id="current-round">1</strong>
+            </div>
+
+            <div>
+                <span>Draw Status</span>
+                <strong id="draw-status">Not drawn</strong>
+            </div>
+        </section>
+
+
+        <!-- ==================== OPPONENT AREA ==================== -->
+        <section id="opponent-area" class="player-area">
+            <h2 id="opponent-name">Player 2</h2>
+
+            <div class="player-info">
+                <span>Cards in hand: <strong id="opponent-hand-count">11</strong></span>
+                <span>Stash: <strong id="opponent-stash-status">Available</strong></span>
+            </div>
+
+            <div id="opponent-melds" class="meld-container">
+                <h3>Melds</h3>
+                <div class="meld-list" id="opponent-meld-list">
+                    <!-- Generated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== CARD TABLE ==================== -->
+        <section id="card-table" aria-label="Card table">
+
+            <div class="pile-container">
+
+                <!-- Draw pile -->
+                <div class="pile" id="draw-pile">
+                    <h3>Draw Pile</h3>
+
+                    <button
+                        id="draw-pile-button"
+                        class="card-pile"
+                        type="button"
+                        aria-label="Draw from draw pile"
+                    >
+                        <span class="card-back">BURACO</span>
+                    </button>
+
+                    <span id="draw-pile-count">0 cards</span>
+                </div>
+
+                <!-- Discard pile -->
+                <div class="pile" id="discard-pile">
+                    <h3>Discard Pile</h3>
+
+                    <div
+                        id="discard-top-card"
+                        class="card-pile"
+                        aria-label="Top discard card"
+                    >
+                        <!-- Generated by JavaScript -->
+                    </div>
+
+                    <span id="discard-pile-count">0 cards</span>
+                </div>
+
+            </div>
+
+            <div id="table-status">
+                <p id="status-message" role="status" aria-live="polite">
+                    Start a new game to begin.
+                </p>
+
+                <p id="error-message" role="alert" aria-live="assertive" hidden></p>
+
+                <p id="success-message" class="success-message" hidden></p>
+            </div>
+
+        </section>
+
+
+        <!-- ==================== ACTIVE PLAYER AREA ==================== -->
+        <section id="active-player-area" class="player-area">
+
+            <div class="player-heading">
+                <h2 id="active-player-name">Player 1</h2>
+                <span id="active-player-hand-count">11 cards</span>
+            </div>
+
+            <!-- Active player melds -->
+            <div id="active-melds" class="meld-container">
+                <h3>Your Melds</h3>
+
+                <div id="active-meld-list" class="meld-list">
+                    <!-- Generated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Player stash -->
+            <div id="stash-area">
+                <div>
+                    <h3>Your Stash</h3>
+                    <span id="stash-status">Available</span>
+                </div>
+
+                <p id="stash-description">
+                    An 11-card stash is available.
+                </p>
+
+                <button id="take-stash-button" type="button" disabled>
+                    Take Stash
+                </button>
+            </div>
+
+            <!-- Player hand -->
+            <div id="hand-area">
+                <div class="hand-heading">
+                    <h3>Your Hand</h3>
+                    <span id="selected-count">0 selected</span>
+                </div>
+
+                <div
+                    id="player-hand"
+                    class="card-container"
+                    role="group"
+                    aria-label="Your playing cards"
+                >
+                    <!-- Cards generated by JavaScript -->
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ==================== ACTION CONTROLS ==================== -->
+        <section id="action-controls" aria-label="Game actions">
+
+            <div class="action-group">
+                <h3>1. Draw</h3>
+
+                <button id="draw-button" type="button" disabled>
+                    Draw Card
+                </button>
+
+                <button id="take-discard-button" type="button" disabled>
+                    Take Discard Pile
+                </button>
+            </div>
+
+            <div class="action-group">
+                <h3>2. Play Cards</h3>
+
+                <button id="create-meld-button" type="button" disabled>
+                    Create Meld
+                </button>
+
+                <button id="extend-meld-button" type="button" disabled>
+                    Extend Meld
+                </button>
+            </div>
+
+            <div class="action-group">
+                <h3>3. Finish Turn</h3>
+
+                <button id="discard-button" type="button" disabled>
+                    Discard Selected Card
+                </button>
+
+                <button id="clear-selection-button" type="button" disabled>
+                    Clear Selection
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==================== PASS-AND-PLAY OVERLAY ==================== -->
+    <section
+        id="pass-screen"
+        class="overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pass-title"
+        hidden
+    >
+        <div class="overlay-content">
+
+            <h2 id="pass-title">Pass the Device</h2>
+
+            <p id="pass-message">
+                Give the device to Player 2.
+            </p>
+
+            <p>
+                Make sure the previous player's cards are no longer visible.
+            </p>
+
+            <button id="reveal-hand-button" type="button">
+                Reveal My Hand
+            </button>
+
+        </div>
     </section>
 
-    <!-- ===================== 3. JS ===================== -->
-    <section class="file file-js" id="js">
-      <h2>3. script.js: what happens when you act</h2>
-      <p>
-        JavaScript runs instructions when something happens: a click, a key press, a typed word.
-        A typical script does three things: <b>find</b> an element, <b>listen</b> for an event, and <b>change</b> something.
-      </p>
-      <pre><code>const button = document.querySelector("#count-btn");   // 1. find
-button.addEventListener("click", () =&gt; {               // 2. listen
-  count = count + 1;
-  output.textContent = count;                           // 3. change
-});</code></pre>
 
-      <h3>Example A: a counter</h3>
-      <div class="demo-row">
-        <button id="count-btn" type="button">Add one</button>
-        <button id="count-reset" type="button" class="quiet">Reset</button>
-        <p class="big">Count: <output id="count-out">0</output></p>
-      </div>
+    <!-- ==================== ROUND-END OVERLAY ==================== -->
+    <section
+        id="round-end-screen"
+        class="overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="round-end-title"
+        hidden
+    >
+        <div class="overlay-content">
 
-      <h3>Example B: a list that grows</h3>
-      <p>Type a task and press Add. Click a task to cross it out.</p>
-      <form id="todo-form" class="demo-row">
-        <label class="grow">
-          <span class="sr">New task</span>
-          <input type="text" id="todo-input" placeholder="e.g. finish homework" autocomplete="off">
-        </label>
-        <button type="submit">Add</button>
-      </form>
-      <ul id="todo-list" class="todo"></ul>
+            <h2 id="round-end-title">Round Complete</h2>
 
-      <p class="log"><b>What script.js just did:</b> <span id="js-log">nothing yet. Click something above.</span></p>
-      <p class="rule"><b>Rule of thumb:</b> if you want to change <em>what happens</em> when someone uses the page, edit <code>script.js</code>.</p>
+            <p id="round-winner">Player 1 wins the round!</p>
+
+            <h3>Points Earned</h3>
+
+            <div class="round-scores">
+                <div>
+                    <span>Player 1</span>
+                    <strong id="player1-round-points">0</strong>
+                </div>
+
+                <div>
+                    <span>Player 2</span>
+                    <strong id="player2-round-points">0</strong>
+                </div>
+            </div>
+
+            <h3>Scoring Breakdown</h3>
+
+            <div id="scoring-breakdown">
+                <!-- Generated by JavaScript -->
+            </div>
+
+            <h3>Updated Scores</h3>
+
+            <div class="round-scores">
+                <div>
+                    <span>Player 1</span>
+                    <strong id="player1-updated-score">0</strong>
+                </div>
+
+                <div>
+                    <span>Player 2</span>
+                    <strong id="player2-updated-score">0</strong>
+                </div>
+            </div>
+
+            <button id="next-round-button" type="button">
+                Continue to Next Round
+            </button>
+
+        </div>
     </section>
 
-    <!-- ===================== 4. CONNECTIONS ===================== -->
-    <section class="file file-all" id="together">
-      <h2>How the three files connect</h2>
-      <p>The browser opens <code>index.html</code> first. Two lines inside it pull in the other files:</p>
-      <pre><code>&lt;head&gt;
-  &lt;link rel="stylesheet" href="styles.css"&gt;   &larr; loads the CSS
-&lt;/head&gt;
-&lt;body&gt;
-  ...content...
-  &lt;script src="script.js"&gt;&lt;/script&gt;         &larr; loads the JavaScript
-&lt;/body&gt;</code></pre>
-      <p>The files find each other through names the HTML gives out: <code>id</code> and <code>class</code>.</p>
-      <pre><code>HTML:  &lt;button id="count-btn" class="quiet"&gt;Add one&lt;/button&gt;
-CSS:   .quiet { background: none; }          /* styles by class */
-JS:    document.querySelector("#count-btn")  /* finds by id */</code></pre>
 
-      <table>
-        <thead>
-          <tr><th>I want to&hellip;</th><th>Open</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Change a heading or add a paragraph</td><td class="t-html">index.html</td></tr>
-          <tr><td>Make the buttons green</td><td class="t-css">styles.css</td></tr>
-          <tr><td>Make something happen on click</td><td class="t-js">script.js</td></tr>
-          <tr><td>Add a new button that does something</td><td>all three: HTML adds it, CSS styles it, JS gives it a job</td></tr>
-        </tbody>
-      </table>
-      <p class="rule">Open each of the three files in a text editor. Every one has comments (the lines starting with <code>&lt;!--</code>, <code>/*</code> or <code>//</code>) that explain the code next to them.</p>
+    <!-- ==================== GAME-OVER OVERLAY ==================== -->
+    <section
+        id="game-over-screen"
+        class="overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="game-over-title"
+        hidden
+    >
+        <div class="overlay-content">
+
+            <h2 id="game-over-title">Game Over</h2>
+
+            <p id="game-winner">Player 1 wins!</p>
+
+            <h3>Final Scores</h3>
+
+            <div class="round-scores">
+                <div>
+                    <span>Player 1</span>
+                    <strong id="player1-final-score">0</strong>
+                </div>
+
+                <div>
+                    <span>Player 2</span>
+                    <strong id="player2-final-score">0</strong>
+                </div>
+            </div>
+
+            <button id="restart-game-button" type="button">
+                Start New Game
+            </button>
+
+        </div>
     </section>
 
-  </main>
 
-  <!-- Load JavaScript last, so the elements above already exist when it looks for them. -->
-  <script src="script.js"></script>
+    <!-- ==================== HOW TO PLAY MODAL ==================== -->
+    <section
+        id="rules-screen"
+        class="overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rules-title"
+        hidden
+    >
+        <div class="overlay-content rules-content">
+
+            <div class="modal-heading">
+                <h2 id="rules-title">How to Play Buraco</h2>
+
+                <button
+                    id="close-rules-button"
+                    type="button"
+                    aria-label="Close rules"
+                >
+                    Close
+                </button>
+            </div>
+
+            <section>
+                <h3>1. Objective</h3>
+                <p>
+                    Form combinations of cards, complete Buracos,
+                    collect points, and reach 2,100 points before
+                    your opponent.
+                </p>
+            </section>
+
+            <section>
+                <h3>2. Setup</h3>
+                <p>
+                    The game uses two standard 52-card decks and
+                    four printed jokers. Players receive initial
+                    hands, and two separate 11-card stashes are prepared.
+                </p>
+            </section>
+
+            <section>
+                <h3>3. Turn Sequence</h3>
+                <ol>
+                    <li>Draw from the draw pile or take the discard pile.</li>
+                    <li>Create new melds or extend existing melds.</li>
+                    <li>Discard one card to finish your turn.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>4. Drawing Cards</h3>
+                <p>
+                    A player can draw from the draw pile or take
+                    the discard pile according to the implemented
+                    discard-pile rules.
+                </p>
+            </section>
+
+            <section>
+                <h3>5. Creating Sequences and Sets</h3>
+                <p>
+                    A meld is a valid combination of cards.
+                    Sequences consist of consecutive cards of the
+                    same suit. Sets consist of cards of the same rank,
+                    if enabled by the selected rules.
+                </p>
+            </section>
+
+            <section>
+                <h3>6. Wild Cards</h3>
+                <p>
+                    Jokers and twos can act as wild cards.
+                    Their permitted use and restrictions depend
+                    on the selected rules.
+                </p>
+            </section>
+
+            <section>
+                <h3>7. Completing a Buraco</h3>
+                <p>
+                    A Buraco is a meld containing at least seven cards.
+                    Clean Buracos contain no wild cards; dirty Buracos
+                    contain at least one wild card.
+                </p>
+            </section>
+
+            <section>
+                <h3>8. Card Values</h3>
+                <p>
+                    Cards have individual point values.
+                    Jokers, twos, face cards, aces, and numbered
+                    cards may have different values.
+                </p>
+
+                <div id="card-values-table">
+                    <!-- Generated or populated by JavaScript -->
+                </div>
+            </section>
+
+            <section>
+                <h3>9. Stash Mechanics</h3>
+                <p>
+                    Each player has an 11-card stash.
+                    When a player empties their hand for the first
+                    time, they may take their stash.
+                    The stash contents remain private.
+                </p>
+            </section>
+
+            <section>
+                <h3>10. Round-End Scoring</h3>
+                <p>
+                    Points are calculated from melds, completed
+                    Buracos, remaining cards, and applicable bonuses
+                    or penalties.
+                </p>
+            </section>
+
+            <section>
+                <h3>11. Game Settings and Assumptions</h3>
+
+                <p>
+                    Some Buraco rules vary by region and variant.
+                    The following implementation defaults are used
+                    unless explicitly configured otherwise.
+                </p>
+
+                <div id="game-rules-settings">
+                    <!-- Generated or populated by JavaScript -->
+                </div>
+            </section>
+
+            <button id="close-rules-footer-button" type="button">
+                Close Rules
+            </button>
+
+        </div>
+    </section>
+
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer id="app-footer">
+        <p>Buraco | Local Two-Player Card Game</p>
+    </footer>
+
 </body>
 </html>
